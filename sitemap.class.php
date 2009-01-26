@@ -16,7 +16,7 @@
  * @category   class
  * @package    sitemap
  * @author     Mhd Zaher Ghaibeh <zaher@mhdzaherghaibeh.name>
- * @copyright  1997-2008 The PHP Group
+ * @copyright  2009 Mhd Zaher Ghaibeh
  * @license    http://www.gnu.org/licenses/gpl.html  GPL V 2.0
  * @version    CVS: $Id: sitemap.php,v 0.8 2009/01/24 cellog Exp $
  */
@@ -26,7 +26,7 @@ class sitemap {
 	public $siteUrl = '';
 	public $proxy = NULL;
 	public $proxy_port=NULL;
-//	private $search = array("http://search.yahooapis.com/SiteExplorerService/V1/ping","http://www.google.com/webmasters/sitemaps/ping");
+
 	public function prepare(){
 		require_once(ABSPath.'/lib/php/pear/System.php');
 		if(!file_exists(ABSPath.'/'.$this->file_name)){
