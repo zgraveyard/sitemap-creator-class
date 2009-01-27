@@ -1,5 +1,5 @@
 ﻿what i have to do :
 -------------------
-1- i have to make the class fully php 5 , for example add a _constructor function , and so on.
-2- try to ditch the use of file_archive pear package
-3- try to handel more than 1 search engine like yahoo and google not only google
+1- I have to make the class fully php 5 , for example add a _constructor function , and so on.
+2- Try to ditch the use of file_archive pear package
+3- Try to handel more than 1 search engine like yahoo and google not only google

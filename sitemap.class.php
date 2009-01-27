@@ -22,12 +22,14 @@
  */
 
 class sitemap {
-	private $file_name= 'sitemap.xml';
-	public $siteUrl = '';
-	public $proxy = NULL;
-	public $proxy_port=NULL;
-
-	public function prepare(){
+	function __constructor(){
+		private $file_name= 'sitemap.xml';
+		public $siteUrl = '';
+		public $proxy = NULL;
+		public $proxy_port=NULL;	
+	}
+	public function prepare($siteUrl){
+		$this->siteUrl = $siteUrl;
 		require_once(ABSPath.'/lib/php/pear/System.php');
 		if(!file_exists(ABSPath.'/'.$this->file_name)){
 			$handle = fopen(ABSPath.'/'.$this->file_name,'w');
@@ -44,8 +46,8 @@ class sitemap {
 	private function writeFirst(){
 		$this->defaultData = <<<XML
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- sitemap-generator-program="proShop" sitemap-generator-version="1.0.2" -->
-<!-- programmed-by="Mhd Zaher Ghaibeh" programmer-email="linux.juggler@gmail.com" -->
+<!-- sitemap-generator-program="sitemap-creator-class" sitemap-generator-version="0.8" -->
+<!-- programmed-by="Mhd Zaher Ghaibeh" programmer-email="zaher@mhdzaherghaibeh.name" -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </urlset>
 XML;
@@ -64,7 +66,9 @@ XML;
 		}
 		$this->write($xml->asXML());
 		$this->submit();
-		$this->genGZ();
+		if(!$this->genGZ()){
+			echo('couldnt chmod the gz file.');
+		}
 		$this->genRobot();
 		return true;
 	}
@@ -91,15 +95,15 @@ XML;
         if ($code != 200) {
              die($result->error);
         }elseif($code == 200){
-        	print 'URL has submitted successfuly to '.$site.'';
+        	print $this->siteUrl.'/'.$this->file_name.' has been submitted successfuly to '.$site.'';
         }
     }
 
 	private function fetch_remote_file ($url, $proxyHost= NULL , $proxyPort = NULL,$headers = "" ) {
-		require_once(ABSPath.'/lib/php/rss/extlib/Snoopy.class.inc');
+		require_once(ABSPath.'/lib/php/Snoopy.class.inc');
 		$client = new Snoopy();
 		$client->rawheaders["Pragma"] = "no-cache";
-		$client->agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.14) Gecko/20080404 Firefox/3.0.1';
+		$client->agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.14) Gecko/20080404 Firefox/3.0.5';
 		if(($proxyHost != NULL) && ( $proxyPort != NULL )){
 			$client->proxy_host = $proxyHost;
 			$client->proxy_port = $proxyPort;
@@ -118,19 +122,15 @@ XML;
 		         File_Archive::toFiles()
 		    )
 		);
-		chmod('sitemap.xml.gz',0666);
-		return true;
+		return chmod('sitemap.xml.gz',0666);
     }
     private function genRobot(){
     	global $siteConfig;
  		require_once(ABSPath.'/lib/php/pear/System.php');
  		$content ="User-Agent: *
-Disallow: /admin/
-Disallow: /lib/
-Disallow: search.php
 Allow: /*
-Sitemap: ".$siteConfig['siteUrl']."/sitemap.xml
-Sitemap: ".$siteConfig['siteUrl']."sitemap.xml.gz";
+Sitemap: ".$this->siteUrl."/sitemap.xml
+Sitemap: ".$this->siteUrl."sitemap.xml.gz";
 		if(!file_exists(ABSPath.'/robots.txt')){
 			$handle = fopen(ABSPath.'/robots.txt','w');
 			fwrite($handle,$content);
