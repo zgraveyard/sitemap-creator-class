@@ -118,6 +118,8 @@ XML;
 		         File_Archive::toFiles()
 		    )
 		);
+		chmod('sitemap.xml.gz',0666);
+		return true;
     }
     private function genRobot(){
     	global $siteConfig;
