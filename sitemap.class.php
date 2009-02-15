@@ -25,18 +25,20 @@ class sitemap {
 	function __constructor(){
 		private $file_name= 'sitemap.xml';
 		public $siteUrl = '';
+		public $siteDir = '';// you have to send your full dirctory like /var/www/home/site/
 		public $proxy = NULL;
 		public $proxy_port=NULL;	
 	}
 	public function prepare($siteUrl){
 		$this->siteUrl = $siteUrl;
-		require_once(ABSPath.'/lib/php/pear/System.php');
-		if(!file_exists(ABSPath.'/'.$this->file_name)){
-			$handle = fopen(ABSPath.'/'.$this->file_name,'w');
+		require_once('System.php');
+		if(!file_exists($siteDir.'/'.$this->file_name)){
+			$handle = fopen($siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$this->writeFirst());
 		}else{
-			@System::rm('-r '.ABSPath.'/'.$this->file_name);
-			$handle = fopen(ABSPath.'/'.$this->file_name,'w');
+			@System::rm('-r '.$siteDir.'/'.$this->file_name);
+			@System::rm('-r '.$siteDir.'/'.$this->file_name.'.gz');
+			$handle = fopen($siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$this->writeFirst());
 		}
 		fclose($handle);
@@ -74,13 +76,13 @@ XML;
 	}
 
 	private function write($content){
-		require_once(ABSPath.'/lib/php/pear/System.php');
-		if(!file_exists(ABSPath.'/'.$this->file_name)){
-			$handle = fopen(ABSPath.'/'.$this->file_name,'w');
+		require_once('System.php');
+		if(!file_exists($siteDir.'/'.$this->file_name)){
+			$handle = fopen($siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$content);
 		}else{
-			@System::rm('-r '.ABSPath.'/'.$this->file_name);
-			$handle = fopen(ABSPath.'/'.$this->file_name,'w');
+			@System::rm('-r '.$siteDir.'/'.$this->file_name);
+			$handle = fopen($siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$content);
 		}
 		fclose($handle);
@@ -100,7 +102,7 @@ XML;
     }
 
 	private function fetch_remote_file ($url, $proxyHost= NULL , $proxyPort = NULL,$headers = "" ) {
-		require_once(ABSPath.'/lib/php/Snoopy.class.inc');
+		require_once('Snoopy.class.inc');
 		$client = new Snoopy();
 		$client->rawheaders["Pragma"] = "no-cache";
 		$client->agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.14) Gecko/20080404 Firefox/3.0.5';
@@ -113,30 +115,23 @@ XML;
 	}
 
     private function genGZ(){
-    	require_once(ABSPath.'/lib/php/pear/File/Archive.php');
-    	$files = array(ABSPath.'/'.$this->file_name);
-		File_Archive::extract(
-		    $files,
-		    File_Archive::toArchive(
-		        ABSPath."/sitemap.xml.gz",
-		         File_Archive::toFiles()
-		    )
-		);
-		return chmod('sitemap.xml.gz',0666);
+		$command = 'gzip -fk9 '.$this->siteDir.'/'.$this->file_name.'';
+		$retVal = system($command);
+		return $retVal;
     }
     private function genRobot(){
     	global $siteConfig;
- 		require_once(ABSPath.'/lib/php/pear/System.php');
+ 		require_once('System.php');
  		$content ="User-Agent: *
 Allow: /*
-Sitemap: ".$this->siteUrl."/sitemap.xml
-Sitemap: ".$this->siteUrl."sitemap.xml.gz";
-		if(!file_exists(ABSPath.'/robots.txt')){
-			$handle = fopen(ABSPath.'/robots.txt','w');
+Sitemap: ".$this->siteUrl."/".$this->file_name."
+Sitemap: ".$this->siteUrl."/".$this->file_name.".gz";
+		if(!file_exists($siteDir.'/robots.txt')){
+			$handle = fopen($siteDir.'/robots.txt','w');
 			fwrite($handle,$content);
 		}else{
-			@System::rm('-r '.ABSPath.'/robots.txt');
-			$handle = fopen(ABSPath.'/robots.txt','w');
+			@System::rm('-r '.$siteDir.'/robots.txt');
+			$handle = fopen($siteDir.'/robots.txt','w');
 			fwrite($handle,$content);
 		}
 		fclose($handle);
