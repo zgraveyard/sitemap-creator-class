@@ -22,6 +22,7 @@ if(is_array($articles)){
 $siteMap = new sitemap();
 $siteMap->prepare();
 $siteMap->siteUrl = 'http://www.domain.com';
+$siteMap->siteDir = $_SERVER['DOCUMENT_ROOT'];
 $siteMap->proxy='proxy.isp.net'; // use if the proxy is enabled in your ISP , use NULL in your site
 $siteMap->proxy_port='3311'; // use if the proxy is enabled in your ISP , use NULL in your site
 if(!$siteMap->addElements($map)){
