@@ -18,7 +18,7 @@
  * @author     Mhd Zaher Ghaibeh <zaher@mhdzaherghaibeh.name>
  * @copyright  2009 Mhd Zaher Ghaibeh
  * @license    http://www.gnu.org/licenses/gpl.html  GPL V 2.0
- * @version    CVS: $Id: sitemap.php,v 0.8 2009/01/24 cellog Exp $
+ * @version    CVS: $Id: sitemap.php,v 0.9 2009/02/14 cellog Exp $
  */
 
 class sitemap {
