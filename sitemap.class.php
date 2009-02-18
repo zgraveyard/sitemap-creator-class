@@ -22,13 +22,21 @@
  */
 
 class sitemap {
+	
+	private $file_name;
+	public $siteUrl;
+	public $siteDir; // you have to put your full dirctory like /var/www/home/site/
+	public $proxy;
+	public $proxy_port;
+	
 	function __constructor(){
-		private $file_name= 'sitemap.xml';
-		public $siteUrl = '';
-		public $siteDir = '';// you have to send your full dirctory like /var/www/home/site/
-		public $proxy = NULL;
-		public $proxy_port=NULL;	
+		$this->file_name = 'sitemap.xml';
+		$this->siteUrl = '';
+		$this->siteDir = '';
+		$this->proxy = NULL;
+		$this->proxy_port = NULL:
 	}
+
 	public function prepare($siteUrl){
 		$this->siteUrl = $siteUrl;
 		require_once('System.php');
@@ -88,6 +96,7 @@ XML;
 		fclose($handle);
 		return true;
 	}
+
     private function submit($site = 'http://www.google.com/webmasters/sitemaps/ping')
     {
     	global $siteConfig;
@@ -119,6 +128,7 @@ XML;
 		$retVal = system($command);
 		return $retVal;
     }
+
     private function genRobot(){
     	global $siteConfig;
  		require_once('System.php');
