@@ -18,35 +18,36 @@
  * @author     Mhd Zaher Ghaibeh <zaher@mhdzaherghaibeh.name>
  * @copyright  2009 Mhd Zaher Ghaibeh
  * @license    http://www.gnu.org/licenses/gpl.html  GPL V 2.0
- * @version    CVS: $Id: sitemap.php,v 0.9 2009/02/14 cellog Exp $
+ * @version    CVS: $Id: sitemap.php,v 0.9.0.1 2009/02/14 cellog Exp $
  */
 
 class sitemap {
 	
-	private $file_name;
+	private $file_name = 'sitemap.xml';
 	public $siteUrl;
 	public $siteDir; // you have to put your full dirctory like /var/www/home/site/
 	public $proxy;
 	public $proxy_port;
+    private $version ='0.9.0.1';
 	
 	function __constructor(){
-		$this->file_name = 'sitemap.xml';
+		$this->file_name='';
 		$this->siteUrl = '';
 		$this->siteDir = '';
 		$this->proxy = NULL;
-		$this->proxy_port = NULL:
+		$this->proxy_port = NULL;
 	}
 
 	public function prepare($siteUrl){
 		$this->siteUrl = $siteUrl;
 		require_once('System.php');
-		if(!file_exists($siteDir.'/'.$this->file_name)){
-			$handle = fopen($siteDir.'/'.$this->file_name,'w');
+		if(!file_exists($this->siteDir.'/'.$this->file_name)){
+			$handle = fopen($this->siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$this->writeFirst());
 		}else{
-			@System::rm('-r '.$siteDir.'/'.$this->file_name);
-			@System::rm('-r '.$siteDir.'/'.$this->file_name.'.gz');
-			$handle = fopen($siteDir.'/'.$this->file_name,'w');
+			@System::rm('-r '.$this->siteDir.'/'.$this->file_name);
+			@System::rm('-r '.$this->siteDir.'/'.$this->file_name.'.gz');
+			$handle = fopen($this->siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$this->writeFirst());
 		}
 		fclose($handle);
@@ -54,13 +55,11 @@ class sitemap {
 	}
 
 	private function writeFirst(){
-		$this->defaultData = <<<XML
-<?xml version='1.0' encoding='UTF-8'?>
-<!-- sitemap-generator-program="sitemap-creator-class" sitemap-generator-version="0.8" -->
-<!-- programmed-by="Mhd Zaher Ghaibeh" programmer-email="zaher@mhdzaherghaibeh.name" -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-</urlset>
-XML;
+		$this->defaultData = "<?xml version='1.0' encoding='UTF-8'?>
+<!-- sitemap-generator-program='sitemap-creator-class' sitemap-generator-version='$this->version' -->
+<!-- programmed-by='Mhd Zaher Ghaibeh' programmer-email='zaher@mhdzaherghaibeh.name' -->
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+</urlset>";
 		return $this->defaultData;
 	}
 
@@ -76,21 +75,19 @@ XML;
 		}
 		$this->write($xml->asXML());
 		$this->submit();
-		if(!$this->genGZ()){
-			echo('couldnt chmod the gz file.');
-		}
+		$this->genGZ();
 		$this->genRobot();
 		return true;
 	}
 
 	private function write($content){
 		require_once('System.php');
-		if(!file_exists($siteDir.'/'.$this->file_name)){
-			$handle = fopen($siteDir.'/'.$this->file_name,'w');
+		if(!file_exists($this->siteDir.'/'.$this->file_name)){
+			$handle = fopen($this->siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$content);
 		}else{
-			@System::rm('-r '.$siteDir.'/'.$this->file_name);
-			$handle = fopen($siteDir.'/'.$this->file_name,'w');
+			@System::rm('-r '.$this->siteDir.'/'.$this->file_name);
+			$handle = fopen($this->siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$content);
 		}
 		fclose($handle);
@@ -104,9 +101,10 @@ XML;
     	$result = $this->fetch_remote_file($url,$this->proxy,$this->proxy_port);
     	$code = $result->status;
         if ($code != 200) {
-             die($result->error);
+             print('Error while submitting the file : '.$result->error.'<br />');
         }elseif($code == 200){
-        	print $this->siteUrl.'/'.$this->file_name.' has been submitted successfuly to '.$site.'';
+        	print $this->siteUrl.'/'.$this->file_name.
+                  ' has been submitted successfuly to '.$site.'<br />';
         }
     }
 
@@ -125,8 +123,10 @@ XML;
 
     private function genGZ(){
 		$command = 'gzip -fk9 '.$this->siteDir.'/'.$this->file_name.'';
-		$retVal = system($command);
-		return $retVal;
+		system($command,$reval);
+        if($reval != FALSE){
+            print('an error in generating the gz file.<br />');
+        }
     }
 
     private function genRobot(){
@@ -134,14 +134,15 @@ XML;
  		require_once('System.php');
  		$content ="User-Agent: *
 Allow: /*
+Disallow : /admin/*
 Sitemap: ".$this->siteUrl."/".$this->file_name."
 Sitemap: ".$this->siteUrl."/".$this->file_name.".gz";
-		if(!file_exists($siteDir.'/robots.txt')){
-			$handle = fopen($siteDir.'/robots.txt','w');
+		if(!file_exists($this->siteDir.'/robots.txt')){
+			$handle = fopen($this->siteDir.'/robots.txt','w');
 			fwrite($handle,$content);
 		}else{
-			@System::rm('-r '.$siteDir.'/robots.txt');
-			$handle = fopen($siteDir.'/robots.txt','w');
+			@System::rm('-r '.$this->siteDir.'/robots.txt');
+			$handle = fopen($this->siteDir.'/robots.txt','w');
 			fwrite($handle,$content);
 		}
 		fclose($handle);
