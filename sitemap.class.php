@@ -18,35 +18,38 @@
  * @author     Mhd Zaher Ghaibeh <zaher@mhdzaherghaibeh.name>
  * @copyright  2009 Mhd Zaher Ghaibeh
  * @license    http://www.gnu.org/licenses/gpl.html  GPL V 2.0
- * @version    CVS: $Id: sitemap.php,v 0.9.0.1 2009/02/14 cellog Exp $
+ * @version    CVS: $Id: sitemap.php,v 0.9.0.2 2009/02/20 cellog Exp $
  */
 
 class sitemap {
-	
-	private $file_name = 'sitemap.xml';
-	public $siteUrl;
+
+	private $file_name = 'sitemap.xml'; // the sitemap.xml file which is usually sitemap.xml
+    private $version ='0.9.0.2'; // the version of the class
+	public $siteUrl; // the site url
 	public $siteDir; // you have to put your full dirctory like /var/www/home/site/
-	public $proxy;
-	public $proxy_port;
-    private $version ='0.9.0.1';
-	
+	public $proxy; // the proxy for the isp or the hoster
+	public $proxy_port; // the port for the isp proxy or the hoster 
+
 	function __constructor(){
-		$this->file_name=$file_name;
+		$this->file_name= $file_name;
 		$this->siteUrl = '';
 		$this->siteDir = '';
 		$this->proxy = NULL;
 		$this->proxy_port = NULL;
 	}
-
+/*
+ * prepare function , will get the siteUrl
+ * and make sure that the files are ready to be written
+ * @param $siteUrl string which is the full site url 
+ */
 	public function prepare($siteUrl){
 		$this->siteUrl = $siteUrl;
-		require_once('System.php');
 		if(!file_exists($this->siteDir.'/'.$this->file_name)){
 			$handle = fopen($this->siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$this->writeFirst());
 		}else{
-			@System::rm('-r '.$this->siteDir.'/'.$this->file_name);
-			@System::rm('-r '.$this->siteDir.'/'.$this->file_name.'.gz');
+			@unlink($this->siteDir.'/'.$this->file_name);
+			@unlink($this->siteDir.'/'.$this->file_name.'.gz');
 			$handle = fopen($this->siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$this->writeFirst());
 		}
@@ -54,6 +57,9 @@ class sitemap {
 		return true;
 	}
 
+/*
+ * writeFirst function will add the first few lines of code to the sitemap.xml file
+ */
 	private function writeFirst(){
 		$this->defaultData = "<?xml version='1.0' encoding='UTF-8'?>
 <!-- sitemap-generator-program='sitemap-creator-class' sitemap-generator-version='$this->version' -->
@@ -63,6 +69,12 @@ class sitemap {
 		return $this->defaultData;
 	}
 
+/*
+ * addElements function , will add the required elements to the xml node
+ * which we are building.
+ * @param $elementArray array the elements array
+ * @return true boolian when done.
+ */
 	public function addElements($elementArray){
 		$xml = new SimpleXMLElement($this->writeFirst());
 		$count = count($elementArray);
@@ -79,14 +91,18 @@ class sitemap {
 		$this->genRobot();
 		return true;
 	}
-
+/*
+ * write function write the conetnt to the sitemap.xml file
+ * but be noticed that the old one will be deleted
+ * @param $content string , which is fomrmated as XML content
+ * @return true boolian when done 
+ */
 	private function write($content){
-		require_once('System.php');
 		if(!file_exists($this->siteDir.'/'.$this->file_name)){
 			$handle = fopen($this->siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$content);
 		}else{
-			@System::rm('-r '.$this->siteDir.'/'.$this->file_name);
+			@unlink($this->siteDir.'/'.$this->file_name);
 			$handle = fopen($this->siteDir.'/'.$this->file_name,'w');
 			fwrite($handle,$content);
 		}
@@ -94,6 +110,10 @@ class sitemap {
 		return true;
 	}
 
+/*
+ * submit function, will submitted the sitemap url to google right now
+ * @param $site string : the url to google sitemap ping services.
+ */
     private function submit($site = 'http://www.google.com/webmasters/sitemaps/ping')
     {
     	global $siteConfig;
@@ -108,6 +128,14 @@ class sitemap {
         }
     }
 
+/*
+ * fetch_remote_file function , fetch the result of the url we sent
+ * @param $url string : the url which we want to get the result from
+ * @param $proxyHost string : the proxy which is used in the user internet connection , i heard that godaddy users must use one
+ * @param $proxyPort string : the port of the proxy which we are using .
+ * @param $headers string : the headers that we are going to sent with our http request.
+ * @return $client string: the result of the fecthing.
+ */
 	private function fetch_remote_file ($url, $proxyHost= NULL , $proxyPort = NULL,$headers = "" ) {
 		require_once('Snoopy.class.inc');
 		$client = new Snoopy();
@@ -121,6 +149,10 @@ class sitemap {
 		return $client;
 	}
 
+/*
+ * genGZ function , is used to gzip the sitemap.xml file
+ * but be noticed that the old one will be deleted
+ */
     private function genGZ(){
 		$command = 'gzip -fk9 '.$this->siteDir.'/'.$this->file_name.'';
 		system($command,$reval);
@@ -129,9 +161,12 @@ class sitemap {
         }
     }
 
+/*
+ * genRobot function , is used to generate the robots.txt file.
+ * but be noticed that the old one will be deleted
+ */
     private function genRobot(){
     	global $siteConfig;
- 		require_once('System.php');
  		$content ="User-Agent: *
 Allow: /*
 Disallow : /admin/*
@@ -141,7 +176,7 @@ Sitemap: ".$this->siteUrl."/".$this->file_name.".gz";
 			$handle = fopen($this->siteDir.'/robots.txt','w');
 			fwrite($handle,$content);
 		}else{
-			@System::rm('-r '.$this->siteDir.'/robots.txt');
+			@unlink($this->siteDir.'/robots.txt');
 			$handle = fopen($this->siteDir.'/robots.txt','w');
 			fwrite($handle,$content);
 		}
