@@ -31,7 +31,7 @@ class sitemap {
     private $version ='0.9.0.1';
 	
 	function __constructor(){
-		$this->file_name='';
+		$this->file_name=$file_name;
 		$this->siteUrl = '';
 		$this->siteDir = '';
 		$this->proxy = NULL;
