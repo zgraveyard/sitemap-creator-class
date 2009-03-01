@@ -18,24 +18,25 @@
  * @author     Mhd Zaher Ghaibeh <zaher@mhdzaherghaibeh.name>
  * @copyright  2009 Mhd Zaher Ghaibeh
  * @license    http://www.gnu.org/licenses/gpl.html  GPL V 2.0
- * @version    CVS: $Id: sitemap.php,v 0.9.0.2 2009/02/20 cellog Exp $
+ * @version    CVS: $Id: sitemap.php,v 0.9.0.3 2009/03/01 cellog Exp $
  */
 
 class sitemap {
 
 	private $file_name = 'sitemap.xml'; // the sitemap.xml file which is usually sitemap.xml
-    private $version ='0.9.0.2'; // the version of the class
+    private $version ='0.9.0.3'; // the version of the class
 	public $siteUrl; // the site url
 	public $siteDir; // you have to put your full dirctory like /var/www/home/site/
 	public $proxy; // the proxy for the isp or the hoster
 	public $proxy_port; // the port for the isp proxy or the hoster 
-
+    private $search_eng = array('http://www.google.com/webmasters/sitemaps/ping','http://submissions.ask.com/ping'); // an array with the search engines url.
 	function __constructor(){
 		$this->file_name= $file_name;
 		$this->siteUrl = '';
 		$this->siteDir = '';
 		$this->proxy = NULL;
 		$this->proxy_port = NULL;
+        $this->search_eng = $search_eng;
 	}
 /*
  * prepare function , will get the siteUrl
@@ -86,7 +87,7 @@ class sitemap {
 			$data->addChild('priority',$elementArray[$i]['priority']);
 		}
 		$this->write($xml->asXML());
-		$this->submit();
+		$this->submit($this->search_eng);
 		$this->genGZ();
 		$this->genRobot();
 		return true;
@@ -114,17 +115,31 @@ class sitemap {
  * submit function, will submitted the sitemap url to google right now
  * @param $site string : the url to google sitemap ping services.
  */
-    private function submit($site = 'http://www.google.com/webmasters/sitemaps/ping')
+    private function submit($sites = 'http://www.google.com/webmasters/sitemaps/ping')
     {
-    	global $siteConfig;
-    	$url = $site.'?sitemap='.htmlentities($this->siteUrl.'/'.$this->file_name).'';
-    	$result = $this->fetch_remote_file($url,$this->proxy,$this->proxy_port);
-    	$code = $result->status;
-        if ($code != 200) {
-             print('Error while submitting the file : '.$result->error.'<br />');
-        }elseif($code == 200){
-        	print $this->siteUrl.'/'.$this->file_name.
-                  ' has been submitted successfuly to '.$site.'<br />';
+    	if(is_array($sites)){
+            foreach($sites as $site){
+                $url = $site.'?sitemap='.htmlentities($this->siteUrl.'/'.$this->file_name).'';
+                $result = $this->fetch_remote_file($url,$this->proxy,$this->proxy_port);
+                $code = $result->status;
+                if ($code != 200) {
+                     print('Error while submitting the file :
+                           '.$result->error.' to '.$site.' <br />');
+                }elseif($code == 200){
+                    print $this->siteUrl.'/'.$this->file_name.
+                          ' has been submitted successfuly to '.$site.'<br />';
+                }
+            }
+        }else{
+            $url = $sites.'?sitemap='.htmlentities($this->siteUrl.'/'.$this->file_name).'';
+            $result = $this->fetch_remote_file($url,$this->proxy,$this->proxy_port);
+            $code = $result->status;
+            if ($code != 200) {
+                 print('Error while submitting the file : '.$result->error.'<br />');
+            }elseif($code == 200){
+                print $this->siteUrl.'/'.$this->file_name.
+                      ' has been submitted successfuly to '.$sites.'<br />';
+            }
         }
     }
 
