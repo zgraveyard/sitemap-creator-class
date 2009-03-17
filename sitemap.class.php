@@ -29,7 +29,7 @@ class sitemap {
 	public $siteDir; // you have to put your full dirctory like /var/www/home/site/
 	public $proxy; // the proxy for the isp or the hoster
 	public $proxy_port; // the port for the isp proxy or the hoster 
-    private $search_eng = array('http://www.google.com/webmasters/sitemaps/ping','http://submissions.ask.com/ping'); // an array with the search engines url.
+    private $search_eng = array('http://www.google.com/webmasters/sitemaps/ping','http://submissions.ask.com/ping','http://webmaster.live.com/ping.aspx'); // an array with the search engines url.
 	function __constructor(){
 		$this->file_name= $file_name;
 		$this->siteUrl = '';
