@@ -169,7 +169,7 @@ class sitemap {
  * but be noticed that the old one will be deleted
  */
     private function genGZ(){
-		$command = 'gzip -fk9 '.$this->siteDir.'/'.$this->file_name.'';
+		$command = 'gzip -fc9 '.$this->siteDir.'/'.$this->file_name.' > '.$this->siteDir.'/'.$this->file_name.'';
 		system($command,$reval);
         if($reval != FALSE){
             print('an error in generating the gz file.<br />');
